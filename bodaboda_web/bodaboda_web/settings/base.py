@@ -83,6 +83,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'bodaboda_web.bodaboda_web.urls'
+WSGI_APPLICATION = 'bodaboda_web.bodaboda_web.wsgi.application'
 
 TEMPLATES = [
     {
