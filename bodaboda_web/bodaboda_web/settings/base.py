@@ -82,7 +82,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'bodaboda_web.urls'
+ROOT_URLCONF = 'bodaboda_web.bodaboda_web.urls'
 
 TEMPLATES = [
     {
