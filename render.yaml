@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: bodaboda-web
+    runtime: python
+    runtimeVersion: 3.11
+    startCommand: >
+      pip install gunicorn &&
+      gunicorn bodaboda_web.wsgi --log-file -
+    buildCommand: >
+      python manage.py collectstatic --noinput &&
+      python manage.py migrate
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: bodaboda_web.settings.prod
+      - key: DEBUG
+        value: "0"
+      - key: PYTHONUNBUFFERED
+        value: "1"
+    plan: free

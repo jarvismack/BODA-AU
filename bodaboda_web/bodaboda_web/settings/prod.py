@@ -25,10 +25,12 @@ if len(set(SECRET_KEY)) < 12:
 # =========================
 # ALLOWED HOSTS
 # =========================
-ALLOWED_HOSTS = os.getenv(
-    "ALLOWED_HOSTS",
-    "boda-au.onrender.com,localhost,127.0.0.1"
-).split(",")
+ALLOWED_HOSTS = [
+    host.strip() for host in os.getenv(
+        "ALLOWED_HOSTS",
+        "boda-au.onrender.com,localhost,127.0.0.1"
+    ).split(",")
+]
 
 # =========================
 # ROOT URL CONFIG (CRITICAL FIX)
@@ -51,7 +53,7 @@ DATABASES = {
         'USER': os.getenv('DB_USER', ''),
         'PASSWORD': os.getenv('DB_PASSWORD', ''),
         'HOST': os.getenv('DB_HOST', ''),
-        'PORT': os.getenv('DB_PORT', '5432'),
+        'PORT': int(os.getenv('DB_PORT', '5432')),
         'CONN_MAX_AGE': int(os.getenv('DB_CONN_MAX_AGE', '60')),
     }
 }
@@ -62,7 +64,13 @@ DATABASES = {
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
-    *MIDDLEWARE,
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'axes.middleware.AxesMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
 # =========================
