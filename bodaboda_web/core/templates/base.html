@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="csrf-token" content="{{ csrf_token }}" />
+  <title>Zanzibar Bodaboda</title>
+  <link rel="icon" href="/static/img/app-icon.png" type="image/png" />
+  <link rel="apple-touch-icon" href="/static/img/app-icon.png" />
+  <link rel="stylesheet" href="/static/css/styles.css" />
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+  <div id="splash-screen" class="splash-screen" aria-live="polite" aria-label="App loading screen">
+    <div class="splash-shell">
+      <div class="splash-logo-wrap">
+        <div class="splash-logo-core">
+          <img class="app-icon-image" src="/static/img/app-icon.png" alt="" aria-hidden="true" />
+        </div>
+        <div class="splash-ring"></div>
+        <div class="splash-ring splash-ring-alt"></div>
+      </div>
+      <div class="splash-dot-pop" aria-hidden="true">
+        <span class="pop-dot dot-a"></span>
+        <span class="pop-dot dot-b"></span>
+        <span class="pop-dot dot-c"></span>
+        <span class="pop-dot dot-d"></span>
+        <span class="pop-dot dot-e"></span>
+        <span class="pop-dot dot-f"></span>
+      </div>
+      <p id="splash-line" class="splash-line">Mama Boda</p>
+    </div>
+  </div>
+  <div id="language-modal" class="modal-backdrop language-modal hidden" role="dialog" aria-modal="true" aria-labelledby="language-modal-title" aria-describedby="language-modal-copy">
+    <div class="language-modal-card">
+      <div class="language-modal-badge">BODA AU</div>
+      <h2 id="language-modal-title" data-i18n="lang_prompt_title">Choose your language</h2>
+      <p id="language-modal-copy" data-i18n="lang_prompt_copy">Select the language you prefer. You can change it later in your profile settings.</p>
+      <div class="language-choice-grid">
+        <button class="language-choice-card" type="button" data-language-choice="en">
+          <span class="language-choice-tag language-choice-flag" aria-hidden="true">🇬🇧</span>
+          <span class="language-choice-text">
+            <strong data-i18n="lang_en">English</strong>
+            <small data-i18n="lang_prompt_en_copy">Continue in English</small>
+          </span>
+        </button>
+        <button class="language-choice-card" type="button" data-language-choice="sw">
+          <span class="language-choice-tag language-choice-flag" aria-hidden="true">🇹🇿</span>
+          <span class="language-choice-text">
+            <strong data-i18n="lang_sw">Swahili</strong>
+            <small data-i18n="lang_prompt_sw_copy">Endelea kwa Kiswahili</small>
+          </span>
+        </button>
+      </div>
+      <p class="language-modal-note" data-i18n="lang_prompt_note">You can always change this later from Profile Settings.</p>
+    </div>
+  </div>
+  <header class="topbar">
+    <div class="brand-slot" aria-label="BODA AU brand logo">
+      <span class="brand-mark">
+        <img class="app-icon-image" src="/static/img/app-icon.png" alt="" aria-hidden="true" />
+      </span>
+      <span class="brand-word">BODA <em>AU</em></span>
+    </div>
+    {% if request.user.is_authenticated %}
+      <div class="topbar-actions">
+        <button type="button" id="notif-toggle-btn" class="notif-toggle-btn">
+          <span data-i18n="nav_notifications">Notifications</span>
+          <span id="notif-unread-badge" class="notif-unread-badge hidden">0</span>
+        </button>
+        <form method="post" action="/auth/logout/" id="logout-form">{% csrf_token %}<button type="button" id="logout-btn"><span data-i18n="nav_logout">Logout</span></button></form>
+      </div>
+    {% endif %}
+  </header>
+  <aside id="notif-panel" class="notif-panel hidden">
+    <div class="notif-header">
+      <h4 data-i18n="nav_notifications">Notifications</h4>
+      <div class="notif-actions">
+        <button type="button" id="notif-mark-all-btn" data-i18n="nav_mark_all_read">Mark all read</button>
+        <button type="button" id="notif-clear-btn" data-i18n="nav_clear_all">Clear all</button>
+      </div>
+    </div>
+    <div id="notif-list" class="notif-list"></div>
+  </aside>
+  <div id="toast-stack" class="toast-stack"></div>
+  <main class="container">{% block content %}{% endblock %}</main>
+  <footer class="site-footer">
+    <div class="footer-shell">
+      <section class="footer-brand">
+        <div class="footer-logo-zone" aria-label="Animated logo area">
+          <div class="logo-core">
+            <img class="app-icon-image" src="/static/img/app-icon.png" alt="" aria-hidden="true" />
+          </div>
+          <div class="logo-ring ring-one"></div>
+          <div class="logo-ring ring-two"></div>
+          <div class="logo-pulse"></div>
+        </div>
+        <h4>BODA AU</h4>
+        <p>Reliable Bodaboda and Bajaji rides with secure rider-driver matching across Zanzibar.</p>
+      </section>
+      <section class="footer-links">
+        <h5 data-i18n="footer_platform">Platform</h5>
+        <a href="/" data-i18n="footer_home">Home</a>
+        <a href="/safety-center/" data-i18n="footer_safety">Safety Center</a>
+        <a href="/help-contact/" data-i18n="footer_help">Help & Contact</a>
+      </section>
+      <section class="footer-links">
+        <h5 data-i18n="footer_support">Support</h5>
+        <a href="/safety-center/" data-i18n="footer_safety">Safety Center</a>
+        <a href="/help-contact/" data-i18n="footer_help">Help & Contact</a>
+        <a href="/terms-privacy/" data-i18n="footer_terms">Terms & Privacy</a>
+      </section>
+      <section class="footer-status">
+        <h5 data-i18n="footer_system">System</h5>
+        <div class="logo-style-switch" aria-label="Logo style switcher">
+          <button class="logo-style-btn active" data-logo-style="premium" type="button">Premium</button>
+          <button class="logo-style-btn" data-logo-style="minimal" type="button">Minimal</button>
+          <button class="logo-style-btn" data-logo-style="bold" type="button">Bold</button>
+        </div>
+        <div class="status-pill" data-i18n="footer_secure">Secure Session</div>
+        <div class="status-pill" data-i18n="footer_realtime">Realtime Notifications</div>
+        <div class="status-pill" data-i18n="footer_routes">Zanzibar Active Routes</div>
+      </section>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Zanzibar Bodaboda App. All rights reserved.</span>
+      <span>Built for Zanzibar urban transport operations.</span>
+    </div>
+  </footer>
+  <button id="back-to-top" class="back-to-top hidden" type="button" aria-label="Back to top">↑ Top</button>
+  {% block extra_js %}{% endblock %}
+  <script src="/static/js/site.js"></script>
+</body>
+</html>

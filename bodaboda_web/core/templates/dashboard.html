@@ -1,0 +1,977 @@
+{% extends "base.html" %}
+{% block extra_head %}
+<link
+  rel="stylesheet"
+  href="/static/vendor/leaflet/leaflet.css"
+/>
+{% endblock %}
+{% block content %}
+<div id="dashboard-root" data-role="{{ role }}" data-language="{{ language }}">
+
+<div id="passenger-panel" class="card hidden">
+  <div id="offline-banner" class="offline-banner">Offline mode: actions will sync when connection returns.</div>
+  <div id="payment-setup-modal" class="modal-backdrop payment-setup-modal hidden" role="dialog" aria-modal="true" aria-labelledby="payment-setup-title" aria-describedby="payment-setup-copy">
+    <div class="payment-setup-sheet">
+      <div class="payment-setup-badge">BODA AU</div>
+      <h4 id="payment-setup-title" data-i18n="payment_setup_title">Payment Setup</h4>
+      <p id="payment-setup-copy" data-i18n="payment_setup_copy">Choose your payment method before requesting rides.</p>
+      <button id="payment-cash-option" class="payment-setup-option is-selected" type="button" aria-pressed="true">
+        <span class="payment-setup-icon">💵</span>
+        <span class="payment-setup-copy">
+          <strong data-i18n="payment_cash">Cash Payment</strong>
+          <small data-i18n="payment_cash_copy">Pay the driver directly in Tanzanian shillings when the ride is complete.</small>
+        </span>
+        <span class="payment-setup-check">✓</span>
+      </button>
+      <div class="payment-setup-note">
+        <span class="payment-setup-note-dot"></span>
+        <p>Your first rides will use cash while BODA AU keeps the request flow simple and fast.</p>
+      </div>
+      <button id="payment-continue-btn" class="payment-setup-continue" data-i18n="payment_continue">Continue</button>
+    </div>
+  </div>
+  <section class="passenger-hero">
+    <div>
+      <p class="auth-kicker">Passenger Experience</p>
+      <h3>Ride Zanzibar with Confidence</h3>
+      <p class="auth-copy">Fast matching, transparent fare, and live ride status in one simple panel.</p>
+    </div>
+    <div class="brand-chip">Bodaboda</div>
+  </section>
+
+  <section class="passenger-profile">
+    <div id="passenger-profile-card" class="profile-card-link" role="button" tabindex="0">
+      <div class="profile-card-avatar" id="passenger-profile-avatar"></div>
+      <div class="profile-card-body">
+        <p class="profile-card-label" data-i18n="profile_card_title">Profile</p>
+        <h4 id="passenger-profile-name">Passenger</h4>
+        <p id="passenger-profile-email">passenger@email.com</p>
+      </div>
+      <span class="profile-card-chevron">›</span>
+    </div>
+
+    <div id="passenger-profile-settings" class="profile-settings hidden" aria-hidden="true">
+      <div class="settings-top">
+        <h4 data-i18n="profile_settings_title">Profile Settings</h4>
+        <button id="close-passenger-settings" type="button" class="settings-close">✕</button>
+      </div>
+
+        <div class="settings-section">
+          <div class="section-head">
+            <h5 data-i18n="personal_info_title">Personal Information</h5>
+          </div>
+          <div class="inline-grid">
+            <label><span data-i18n="profile_full_name">Full Name</span><input id="passenger-name" /></label>
+            <label><span data-i18n="profile_email">Email</span><input id="passenger-email" type="email" /></label>
+            <label><span data-i18n="profile_phone">Phone Number</span><input id="passenger-phone" /></label>
+            <label><span data-i18n="profile_language">Language</span>
+              <select id="passenger-language">
+                <option value="en" data-i18n="lang_en">English</option>
+                <option value="sw" data-i18n="lang_sw">Swahili</option>
+              </select>
+            </label>
+            <label><span data-i18n="profile_picture">Profile Picture</span><input id="passenger-image" type="file" accept="image/*" /></label>
+          </div>
+          <button id="save-passenger-profile-btn" data-i18n="passenger_profile_save">Save Passenger Profile</button>
+        </div>
+
+        <div class="settings-section">
+          <div class="section-head">
+            <h5 data-i18n="payment_settings_title">Payment Method</h5>
+          </div>
+          <div class="payment-options">
+            <button id="payment-cash-card" class="payment-card" type="button">
+              <div class="payment-card-body">
+                <span class="payment-icon">💵</span>
+                <div>
+                  <strong data-i18n="payment_cash">Cash Payment</strong>
+                  <p data-i18n="payment_cash_copy">Pay the driver directly in TZS.</p>
+                </div>
+              </div>
+              <span class="payment-check">✓</span>
+            </button>
+          </div>
+          <label class="checkbox-row hidden">
+            <input id="payment-cash-setting" type="checkbox" />
+            <span data-i18n="payment_cash">Cash Payment</span>
+          </label>
+          <button id="save-payment-settings-btn" class="secondary-btn" data-i18n="payment_save">Save Payment Preference</button>
+        </div>
+
+      <div class="settings-section">
+        <div class="section-head">
+          <h5 data-i18n="emergency_contacts_title">Emergency Contact</h5>
+        </div>
+        <div class="inline-grid">
+          <label><span data-i18n="contact1_name">Contact Name</span><input id="passenger-emergency-name-1" /></label>
+          <label><span data-i18n="contact1_phone">Phone Number</span><input id="passenger-emergency-phone-1" /></label>
+          <label><span data-i18n="contact1_relation">Relationship</span><input id="passenger-emergency-relationship-1" /></label>
+          <label><span data-i18n="contact2_name">Contact 2 Name</span><input id="passenger-emergency-name-2" /></label>
+          <label><span data-i18n="contact2_phone">Contact 2 Phone</span><input id="passenger-emergency-phone-2" /></label>
+          <label><span data-i18n="contact2_relation">Contact 2 Relation</span><input id="passenger-emergency-relationship-2" /></label>
+        </div>
+        <button id="save-passenger-emergency-btn" type="button" data-i18n="emergency_contacts_save">Save Emergency Contacts</button>
+      </div>
+
+      <div class="settings-section danger-zone">
+        <div class="section-head">
+          <h5 data-i18n="account_delete_title">Danger Zone</h5>
+        </div>
+        <p data-i18n="account_delete_copy">Deleting your account removes your profile and ride history permanently.</p>
+        <button id="delete-passenger-account-btn" class="danger-btn" type="button" data-i18n="account_delete_btn">Delete Account</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="passenger-story-grid">
+    <article class="story-card story-photo"></article>
+    <article class="story-card story-map">
+      <h4>Smart Matching</h4>
+      <p>System picks nearest available verified driver within 3km.</p>
+    </article>
+    <article class="story-card story-price">
+      <h4>Clear Fare</h4>
+      <p>Motorcycle and Bajaji pricing are calculated before confirmation.</p>
+    </article>
+  </section>
+
+  <section class="weather-advisory-shell">
+    <div class="card-head-row">
+      <h4>Weather Advisory</h4>
+      <button id="refresh-weather-btn" type="button">Refresh Weather</button>
+    </div>
+    <div id="weather-advisory-output" class="ui-board"></div>
+  </section>
+
+  <section class="passenger-ops">
+    <div class="passenger-ops-head">
+      <div>
+        <h4 data-i18n="request_setup_title">Request Setup</h4>
+        <p class="request-hint" data-i18n="request_setup_hint">Active Zanzibar locations only (pickup and dropoff).</p>
+      </div>
+      <button id="load-history-btn" class="ghost-ops-btn" data-i18n="load_history_btn">Load History</button>
+    </div>
+
+    <div class="booking-stage">
+      <div class="booking-map-panel">
+        <div class="booking-map-head">
+          <div>
+            <p class="booking-map-kicker">Live route preview</p>
+            <h5 data-i18n="live_map_title">Live Map</h5>
+          </div>
+          <div class="booking-map-badge">Zanzibar</div>
+        </div>
+        <div id="passenger-map" class="map-canvas booking-map-canvas"></div>
+      </div>
+
+      <div class="request-flow-shell request-bottom-sheet">
+        <div class="request-route-card">
+        <div class="route-chip-row">
+          <span class="route-chip" data-i18n="pickup_location_label">Pickup Location</span>
+          <span class="route-chip route-chip-accent" data-i18n="dropoff_location_label">Dropoff Location</span>
+        </div>
+        <div class="route-builder route-builder-stack">
+          <input id="ride-vehicle-type" type="hidden" value="motorcycle" />
+          <label class="route-field">
+            <span data-i18n="pickup_location_label">Pickup Location</span>
+            <select id="pickup-location">
+          <option value="stone_town">Stone Town</option>
+          <option value="malindi">Malindi</option>
+          <option value="forodhani">Forodhani</option>
+          <option value="darajani">Darajani</option>
+          <option value="mlandege">Mlandege</option>
+          <option value="amaan_stadium">Amaan Stadium</option>
+          <option value="chukwani">Chukwani</option>
+          <option value="kisauni_airport">Kisauni Airport</option>
+          <option value="fumba">Fumba</option>
+          <option value="bweleo">Bweleo</option>
+          <option value="dunga">Dunga</option>
+          <option value="mwera">Mwera</option>
+          <option value="mangapwani">Mangapwani</option>
+          <option value="mkokotoni">Mkokotoni</option>
+          <option value="nungwi">Nungwi</option>
+          <option value="kendwa">Kendwa</option>
+          <option value="kiwengwa">Kiwengwa</option>
+          <option value="matemwe">Matemwe</option>
+          <option value="paje">Paje</option>
+          <option value="jambiani">Jambiani</option>
+          <option value="michamvi">Michamvi</option>
+          <option value="chwaka">Chwaka</option>
+          <option value="makunduchi">Makunduchi</option>
+          <option value="kwanyanya">Kwanyanya</option>
+          <option value="mbuzini_hospital">Mbuzini Hospital</option>
+          <option value="njia_ya_kama">Njia ya Kama</option>
+          <option value="bububu_skuli">Bububu Skuli</option>
+          <option value="kidichi">Kidichi</option>
+          <option value="njia_ya_bumbwini">Njia ya Bumbwini</option>
+            </select>
+          </label>
+          <div class="route-connector" aria-hidden="true">
+            <span></span>
+            <strong>↓</strong>
+            <span></span>
+          </div>
+          <label class="route-field">
+            <span data-i18n="dropoff_location_label">Dropoff Location</span>
+            <select id="dropoff-location">
+          <option value="stone_town">Stone Town</option>
+          <option value="malindi">Malindi</option>
+          <option value="forodhani">Forodhani</option>
+          <option value="darajani">Darajani</option>
+          <option value="mlandege">Mlandege</option>
+          <option value="amaan_stadium">Amaan Stadium</option>
+          <option value="chukwani">Chukwani</option>
+          <option value="kisauni_airport">Kisauni Airport</option>
+          <option value="fumba">Fumba</option>
+          <option value="bweleo">Bweleo</option>
+          <option value="dunga">Dunga</option>
+          <option value="mwera">Mwera</option>
+          <option value="mangapwani">Mangapwani</option>
+          <option value="mkokotoni">Mkokotoni</option>
+          <option value="nungwi">Nungwi</option>
+          <option value="kendwa">Kendwa</option>
+          <option value="kiwengwa">Kiwengwa</option>
+          <option value="matemwe">Matemwe</option>
+          <option value="paje">Paje</option>
+          <option value="jambiani">Jambiani</option>
+          <option value="michamvi">Michamvi</option>
+          <option value="chwaka">Chwaka</option>
+          <option value="makunduchi">Makunduchi</option>
+          <option value="mbuzini_hospital">Mbuzini Hospital</option>
+          <option value="kwanyanya">Kwanyanya</option>
+          <option value="njia_ya_kama">Njia ya Kama</option>
+          <option value="bububu_skuli">Bububu Skuli</option>
+          <option value="kidichi">Kidichi</option>
+          <option value="njia_ya_bumbwini">Njia ya Bumbwini</option>
+            </select>
+          </label>
+        </div>
+        <div class="inline-grid promo-grid">
+          <label><span data-i18n="promo_code_label">Promo Code</span><input id="promo-code" data-i18n-placeholder="promo_code_placeholder" placeholder="Optional promo" /></label>
+          <label><span data-i18n="eta_label">Estimated ETA</span>
+            <input id="eta-preview" readonly value="-- min" />
+          </label>
+        </div>
+        <div class="route-stats route-stats-rich">
+          <div class="stat-item">
+            <span class="stat-label" data-i18n="distance_label">Estimated Distance</span>
+            <strong id="distance-preview">0.00 km</strong>
+          </div>
+          <div class="stat-item stat-item-highlight">
+            <span class="stat-label" id="fare-preview-label" data-i18n="fare_label">Estimated Fare (Motorcycle)</span>
+            <strong id="fare-preview">TZS 0</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="ride-selection-card">
+        <div class="ride-selection-head">
+          <div>
+            <h5 data-i18n="choose_ride_title">Choose a ride</h5>
+            <p data-i18n="choose_ride_copy">Pick the ride that fits your trip best.</p>
+          </div>
+        </div>
+        <div class="ride-option-list">
+          <button class="ride-option-card selected" type="button" data-vehicle-option="motorcycle" aria-pressed="true">
+            <span class="ride-option-visual ride-option-boda" aria-hidden="true">
+              <span class="ride-option-vehicle">B</span>
+            </span>
+            <span class="ride-option-main">
+              <span class="ride-option-topline">
+                <strong data-i18n="vehicle_label_boda">Bodaboda</strong>
+                <span id="ride-card-motorcycle-fare" class="ride-option-fare">TZS 0</span>
+              </span>
+              <span class="ride-option-copy">
+                <span data-i18n="vehicle_copy_boda">Quick solo rides</span>
+                <span id="ride-card-motorcycle-meta" class="ride-option-meta">-- min • 1 seat</span>
+              </span>
+            </span>
+          </button>
+
+          <button class="ride-option-card" type="button" data-vehicle-option="bajaji" aria-pressed="false">
+            <span class="ride-option-visual ride-option-bajaji" aria-hidden="true">
+              <span class="ride-option-vehicle">B</span>
+            </span>
+            <span class="ride-option-main">
+              <span class="ride-option-topline">
+                <strong data-i18n="vehicle_label_bajaji">Bajaji</strong>
+                <span id="ride-card-bajaji-fare" class="ride-option-fare">TZS 0</span>
+              </span>
+              <span class="ride-option-copy">
+                <span data-i18n="vehicle_copy_bajaji">Budget 3-wheel rides</span>
+                <span id="ride-card-bajaji-meta" class="ride-option-meta">-- min • 3 seats</span>
+              </span>
+            </span>
+          </button>
+        </div>
+        <div class="ride-selection-actions">
+          <button id="request-ride-btn" class="primary-ride-btn" data-i18n="request_ride_btn">Request Ride</button>
+          <div class="ride-secondary-actions">
+            <button id="check-nearby-btn" class="secondary-ride-btn" data-i18n="nearby_drivers_btn">Check Nearby Drivers</button>
+            <button id="schedule-ride-btn" class="secondary-ride-btn" type="button" data-i18n="schedule_ride_btn">Schedule Ride</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="schedule-panel schedule-panel-sheet">
+        <h5 data-i18n="schedule_future_ride_title">Schedule a Future Ride</h5>
+        <div class="inline-grid">
+          <label>Date<input id="schedule-date" type="date" /></label>
+          <label>Time<input id="schedule-time" type="time" /></label>
+        </div>
+        <div id="scheduled-output" class="ui-board"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="passenger-anim-stage" class="ride-anim-stage hidden">
+    <div class="anim-head">
+      <h4 id="passenger-anim-title">Ride Update</h4>
+      <span id="passenger-anim-status" class="anim-status">requested</span>
+    </div>
+    <p id="passenger-anim-text" class="anim-text">Preparing your request...</p>
+    <div class="vehicle-track">
+      <div id="passenger-vehicle" class="vehicle-sprite vehicle-motorcycle">BODABODA</div>
+      <div class="track-destination">DESTINATION</div>
+    </div>
+  </section>
+
+  <section class="passenger-data-grid">
+    <div class="passenger-section-card">
+      <div class="passenger-panel-head">
+        <div>
+          <h4>Nearby Drivers</h4>
+          <p>Verified drivers around your pickup point.</p>
+        </div>
+      </div>
+      <div id="nearby-output" class="ui-board"></div>
+    </div>
+    <div class="passenger-section-card">
+      <div class="passenger-panel-head">
+        <div>
+          <h4>Current Ride</h4>
+          <p>Track your active trip and driver details.</p>
+        </div>
+      </div>
+      <button id="passenger-sos-btn" class="sos-btn hidden" type="button">SOS Emergency Alert</button>
+      <div id="current-ride-output" class="ui-board"></div>
+      <div id="receipt-output" class="ui-board"></div>
+      <div id="passenger-rating-card" class="rating-card hidden">
+        <h5>Rate Your Driver</h5>
+        <p id="passenger-rating-target" class="rating-target">Driver</p>
+        <div class="rating-stars" id="passenger-rating-stars" data-value="0">
+          <button type="button" data-star="1">★</button>
+          <button type="button" data-star="2">★</button>
+          <button type="button" data-star="3">★</button>
+          <button type="button" data-star="4">★</button>
+          <button type="button" data-star="5">★</button>
+        </div>
+        <textarea id="passenger-rating-comment" rows="3" placeholder="Optional review..."></textarea>
+        <button id="passenger-submit-rating-btn" type="button">Submit Rating</button>
+      </div>
+    </div>
+    <div class="passenger-section-card">
+      <div class="passenger-panel-head">
+        <div>
+          <h4>Ride History</h4>
+          <p>Your recent completed and past requests.</p>
+        </div>
+      </div>
+      <div id="history-output" class="ui-board"></div>
+    </div>
+  </section>
+
+  <section class="chat-shell">
+    <h4>In-Ride Chat</h4>
+    <div id="chat-messages" class="chat-messages"></div>
+    <div class="chat-input-row">
+      <textarea id="chat-input" rows="2" placeholder="Type a message..."></textarea>
+      <button id="chat-send-btn" type="button">Send</button>
+    </div>
+  </section>
+</div>
+
+<div id="driver-panel" class="card hidden">
+  <section class="driver-hero">
+    <div>
+      <p class="auth-kicker">Driver Command Center</p>
+      <h3>Operate Smart. Earn Faster.</h3>
+      <p class="auth-copy">Manage profile, go online, handle incoming rides, and track your earnings in one place.</p>
+      <div class="driver-station-pill">
+        <span>Station:</span>
+        <strong id="driver-station-name">-</strong>
+        <em id="driver-station-status">Unverified</em>
+      </div>
+    </div>
+    <div class="driver-hero-chip">Driver</div>
+  </section>
+
+  <section class="driver-grid">
+    <article class="driver-card">
+      <div id="driver-profile-card" class="profile-card-link" role="button" tabindex="0">
+        <div class="profile-card-avatar" id="driver-profile-avatar"></div>
+        <div class="profile-card-body">
+          <p class="profile-card-label" data-i18n="profile_card_title">Profile</p>
+          <h4 id="driver-profile-name">Driver</h4>
+          <p id="driver-profile-email">driver@email.com</p>
+        </div>
+        <span class="profile-card-chevron">›</span>
+      </div>
+
+      <div id="driver-profile-settings" class="profile-settings hidden" aria-hidden="true">
+        <div class="settings-top">
+          <h4 data-i18n="profile_settings_title">Profile Settings</h4>
+          <button id="close-driver-settings" type="button" class="settings-close">✕</button>
+        </div>
+
+        <div class="settings-section">
+          <div class="section-head">
+            <h5 data-i18n="personal_info_title">Personal Information</h5>
+          </div>
+          <div class="inline-grid">
+            <label><span data-i18n="profile_full_name">Full Name</span><input id="driver-name" /></label>
+            <label><span data-i18n="profile_email">Email</span><input id="driver-email" type="email" /></label>
+            <label><span data-i18n="profile_phone">Phone Number</span><input id="driver-phone" /></label>
+            <label><span data-i18n="profile_language">Language</span>
+              <select id="driver-language">
+                <option value="en" data-i18n="lang_en">English</option>
+                <option value="sw" data-i18n="lang_sw">Swahili</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <div class="section-head">
+            <h5 data-i18n="driver_profile_title">Driver Profile</h5>
+          </div>
+          <div class="inline-grid">
+            <label><span data-i18n="driver_vehicle_type">Vehicle Type</span>
+              <select id="vehicle-type">
+                <option value="motorcycle" data-i18n="vehicle_motorcycle">Motorcycle</option>
+                <option value="bajaji" data-i18n="vehicle_bajaji">Bajaji</option>
+              </select>
+            </label>
+            <label><span data-i18n="driver_license_number">License Number</span><input id="license-number" /></label>
+            <label><span data-i18n="driver_plate_number">Plate Number</span><input id="plate-number" /></label>
+            <label><span data-i18n="profile_picture">Profile Picture</span><input id="driver-image" type="file" accept="image/*" /></label>
+          </div>
+          <button id="save-driver-profile-btn" data-i18n="driver_profile_save">Save Driver Profile</button>
+          <div id="driver-profile-preview" class="ui-board"></div>
+        </div>
+
+        <div class="settings-section">
+          <div class="section-head">
+            <h5 data-i18n="driver_docs_title">Onboarding Documents</h5>
+          </div>
+          <div class="inline-grid">
+            <label><span data-i18n="driver_doc_type">Document Type</span>
+              <select id="driver-doc-type">
+                <option value="national_id" data-i18n="doc_national_id">National ID</option>
+                <option value="license" data-i18n="doc_license">Driver License</option>
+                <option value="vehicle_insurance" data-i18n="doc_insurance">Vehicle Insurance</option>
+              </select>
+            </label>
+            <label><span data-i18n="driver_doc_upload">Upload File</span><input id="driver-doc-file" type="file" /></label>
+          </div>
+          <button id="upload-driver-doc-btn" type="button" data-i18n="driver_doc_upload_btn">Upload Document</button>
+          <div id="driver-docs-output" class="ui-board"></div>
+        </div>
+
+        <div class="settings-section">
+          <div class="section-head">
+            <h5 data-i18n="emergency_contacts_title">Emergency Contacts</h5>
+          </div>
+          <div class="inline-grid">
+            <label><span data-i18n="contact1_name">Contact 1 Name</span><input id="driver-emergency-name-1" /></label>
+            <label><span data-i18n="contact1_phone">Contact 1 Phone</span><input id="driver-emergency-phone-1" /></label>
+            <label><span data-i18n="contact1_relation">Contact 1 Relation</span><input id="driver-emergency-relationship-1" /></label>
+            <label><span data-i18n="contact2_name">Contact 2 Name</span><input id="driver-emergency-name-2" /></label>
+            <label><span data-i18n="contact2_phone">Contact 2 Phone</span><input id="driver-emergency-phone-2" /></label>
+            <label><span data-i18n="contact2_relation">Contact 2 Relation</span><input id="driver-emergency-relationship-2" /></label>
+          </div>
+          <button id="save-driver-emergency-btn" type="button" data-i18n="emergency_contacts_save">Save Emergency Contacts</button>
+        </div>
+
+        <div class="settings-section danger-zone">
+          <div class="section-head">
+            <h5 data-i18n="account_delete_title">Danger Zone</h5>
+          </div>
+          <p data-i18n="account_delete_copy">Deleting your account removes your profile and ride history permanently.</p>
+          <button id="delete-driver-account-btn" class="danger-btn" type="button" data-i18n="account_delete_btn">Delete Account</button>
+        </div>
+      </div>
+    </article>
+
+    <article class="driver-card">
+      <h4>Availability</h4>
+      <div class="inline-grid">
+        <label>Latitude<input id="driver-lat" value="-6.165917" /></label>
+        <label>Longitude<input id="driver-lng" value="39.202641" /></label>
+      </div>
+      <div class="action-row two-actions">
+        <button id="use-driver-location-btn" type="button">Use My Location</button>
+        <button id="go-online-btn">Go Online</button>
+        <button id="go-offline-btn">Go Offline</button>
+      </div>
+      <div class="map-shell">
+        <h5>Driver Position Map</h5>
+        <div id="driver-map" class="map-canvas"></div>
+      </div>
+    </article>
+  </section>
+
+  <section class="driver-grid">
+    <section id="driver-anim-stage" class="ride-anim-stage hidden">
+      <div class="anim-head">
+        <h4 id="driver-anim-title">Driver Action</h4>
+        <span id="driver-anim-status" class="anim-status">incoming</span>
+      </div>
+      <p id="driver-anim-text" class="anim-text">Monitoring incoming ride requests.</p>
+      <div class="vehicle-track">
+        <div id="driver-vehicle" class="vehicle-sprite vehicle-motorcycle">BODABODA</div>
+        <div class="track-destination">PICKUP</div>
+      </div>
+    </section>
+
+    <article class="driver-card">
+      <div class="card-head-row">
+        <h4>Incoming Rides</h4>
+        <button id="load-incoming-btn">Refresh Incoming</button>
+      </div>
+      <div id="incoming-output" class="ui-board"></div>
+      <label>Ride ID<input id="driver-ride-id" /></label>
+      <input id="driver-ride-status" type="hidden" />
+      <div class="action-row ride-actions">
+        <button id="accept-ride-btn">Accept</button>
+        <button id="start-ride-btn">Start</button>
+        <button id="complete-ride-btn">Complete</button>
+        <button id="cancel-ride-btn" class="ghost-btn">Cancel Ride</button>
+      </div>
+      <button id="driver-sos-btn" class="sos-btn hidden" type="button">SOS Emergency Alert</button>
+      <div id="driver-rating-card" class="rating-card hidden">
+        <h5>Rate Your Passenger</h5>
+        <p id="driver-rating-target" class="rating-target">Passenger</p>
+        <div class="rating-stars" id="driver-rating-stars" data-value="0">
+          <button type="button" data-star="1">★</button>
+          <button type="button" data-star="2">★</button>
+          <button type="button" data-star="3">★</button>
+          <button type="button" data-star="4">★</button>
+          <button type="button" data-star="5">★</button>
+        </div>
+        <textarea id="driver-rating-comment" rows="3" placeholder="Optional review..."></textarea>
+        <button id="driver-submit-rating-btn" type="button">Submit Rating</button>
+      </div>
+    </article>
+
+    <article class="driver-card">
+      <div class="card-head-row">
+        <h4>Earnings</h4>
+        <button id="load-earnings-btn">Load Earnings</button>
+      </div>
+      <p class="card-subcopy">Weekly settlement model: the app charges a flat commission per completed ride and pauses online access when unpaid fees reach the limit.</p>
+      <div id="earnings-output" class="ui-board"></div>
+    </article>
+
+    <article class="driver-card">
+      <div class="card-head-row">
+        <h4>Settlement</h4>
+        <button id="refresh-settlement-btn" type="button">Refresh Settlement</button>
+      </div>
+      <p class="card-subcopy">Use these payment details when settling your weekly commission balance.</p>
+      <div id="driver-settlement-output" class="ui-board"></div>
+    </article>
+
+    <article class="driver-card">
+      <h4>In-Ride Chat</h4>
+      <div id="driver-chat-messages" class="chat-messages"></div>
+      <div class="chat-input-row">
+        <textarea id="driver-chat-input" rows="2" placeholder="Message passenger..."></textarea>
+        <button id="driver-chat-send-btn" type="button">Send</button>
+      </div>
+    </article>
+  </section>
+</div>
+
+<div id="admin-panel" class="card hidden">
+  <section class="admin-shell">
+    <aside class="admin-menu">
+      <h3>Admin</h3>
+      <button class="admin-menu-btn active" data-section="drivers">Manage Drivers</button>
+      <button class="admin-menu-btn" data-section="passengers">Manage Passengers</button>
+      <button class="admin-menu-btn" data-section="reports">Ride Reports</button>
+      <button class="admin-menu-btn" data-section="monitoring">Monitoring</button>
+      <button class="admin-menu-btn" data-section="promos">Promo Codes</button>
+      <button class="admin-menu-btn" data-section="settings">System Settings</button>
+    </aside>
+
+    <section class="admin-main">
+      <div class="admin-toolbar admin-section" data-section="drivers">
+        <div>
+          <h3>Driver Management</h3>
+          <p>Verify and monitor active driver accounts.</p>
+        </div>
+        <div class="admin-toolbar-actions">
+          <button id="add-driver-btn">Add Driver</button>
+          <button id="load-drivers-btn">Refresh Drivers</button>
+        </div>
+      </div>
+
+      <div class="admin-search-wrap admin-section" data-section="drivers">
+        <input id="driver-search" type="text" placeholder="Search name, phone, vehicle..." />
+      </div>
+
+      <div class="admin-form-wrap admin-section hidden" data-section="drivers" id="driver-form-wrap">
+        <h4 id="driver-form-title">Add New Driver</h4>
+        <div class="inline-grid">
+          <label>Name<input id="admin-driver-name" /></label>
+          <label>Phone Number<input id="admin-driver-phone" /></label>
+          <label>Password<input id="admin-driver-password" type="password" /></label>
+          <label>Vehicle Type
+            <select id="admin-driver-vehicle">
+              <option value="motorcycle">Bodaboda</option>
+              <option value="bajaji">Bajaji</option>
+            </select>
+          </label>
+          <label>License Number<input id="admin-driver-license" /></label>
+          <label>Plate Number<input id="admin-driver-plate" /></label>
+          <label>Verified
+            <select id="admin-driver-verified">
+              <option value="false">No</option>
+              <option value="true">Yes</option>
+            </select>
+          </label>
+        </div>
+        <div class="action-row">
+          <button id="save-driver-form-btn">Save Driver</button>
+          <button id="cancel-driver-form-btn" type="button">Cancel</button>
+        </div>
+      </div>
+
+      <div class="admin-table-wrap admin-section" data-section="drivers">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Phone</th>
+              <th>Vehicle</th>
+              <th>Status</th>
+              <th>Online</th>
+              <th>Commission</th>
+              <th>Risk</th>
+              <th>Docs</th>
+              <th>Station</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="drivers-table-body"></tbody>
+        </table>
+      </div>
+
+      <div class="admin-toolbar admin-section hidden" data-section="passengers">
+        <div>
+          <h3>Passenger Management</h3>
+          <p>Manage passenger accounts and profile status.</p>
+        </div>
+        <div class="admin-toolbar-actions">
+          <button id="add-passenger-btn">Add Passenger</button>
+          <button id="load-passengers-btn">Refresh Passengers</button>
+        </div>
+      </div>
+
+      <div class="admin-search-wrap admin-section hidden" data-section="passengers">
+        <input id="passenger-search" type="text" placeholder="Search name or phone..." />
+      </div>
+
+      <div class="admin-form-wrap admin-section hidden" data-section="passengers" id="passenger-form-wrap">
+        <h4 id="passenger-form-title">Add New Passenger</h4>
+        <div class="inline-grid">
+          <label>Name<input id="admin-passenger-name" /></label>
+          <label>Phone Number<input id="admin-passenger-phone" /></label>
+          <label>Password<input id="admin-passenger-password" type="password" /></label>
+          <label>Active
+            <select id="admin-passenger-active">
+              <option value="true">Yes</option>
+              <option value="false">No</option>
+            </select>
+          </label>
+        </div>
+        <div class="action-row">
+          <button id="save-passenger-form-btn">Save Passenger</button>
+          <button id="cancel-passenger-form-btn" type="button">Cancel</button>
+        </div>
+      </div>
+
+      <div class="admin-table-wrap admin-section hidden" data-section="passengers">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Photo</th>
+              <th>Name</th>
+              <th>Phone</th>
+              <th>Status</th>
+              <th>Risk</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="passengers-table-body"></tbody>
+        </table>
+      </div>
+
+      <div id="passenger-quick-view-modal" class="quick-view-modal hidden">
+        <div class="quick-view-card">
+          <div class="quick-view-head">
+            <h4>Passenger Quick View</h4>
+            <button id="passenger-quick-close-btn" class="table-action-btn delete-row-btn" type="button">Close</button>
+          </div>
+          <div class="quick-view-body">
+            <div id="passenger-quick-avatar" class="avatar placeholder quick-avatar">P</div>
+            <div class="quick-view-info">
+              <p><span>ID</span><strong id="passenger-quick-id">-</strong></p>
+              <p><span>Name</span><strong id="passenger-quick-name">-</strong></p>
+              <p><span>Phone</span><strong id="passenger-quick-phone">-</strong></p>
+              <p><span>Status</span><strong id="passenger-quick-status">-</strong></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-section hidden" data-section="reports">
+        <div class="admin-toolbar">
+          <div>
+            <h3>Ride Reports</h3>
+            <p>Operational metrics and top performing drivers.</p>
+          </div>
+          <button id="load-reports-btn">Refresh Reports</button>
+        </div>
+        <div class="report-grid" id="report-grid"></div>
+        <div class="admin-table-wrap">
+          <h4>Scheduled Rides</h4>
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Ride ID</th>
+                <th>Passenger</th>
+                <th>Pickup</th>
+                <th>Dropoff</th>
+                <th>Vehicle</th>
+                <th>Scheduled For</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="scheduled-rides-body"></tbody>
+          </table>
+        </div>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Driver ID</th>
+                <th>Name</th>
+                <th>Completed Rides</th>
+                <th>Revenue (TZS)</th>
+              </tr>
+            </thead>
+            <tbody id="top-drivers-body"></tbody>
+          </table>
+        </div>
+        <div class="admin-table-wrap">
+          <h4>Emergency SOS Events</h4>
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Alert ID</th>
+                <th>Ride ID</th>
+                <th>User</th>
+                <th>Role</th>
+                <th>Location</th>
+                <th>Contacts Notified</th>
+                <th>Timestamp</th>
+              </tr>
+            </thead>
+            <tbody id="emergency-alerts-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="admin-section hidden" data-section="monitoring">
+        <div class="admin-toolbar">
+          <div>
+            <h3>Live Monitoring</h3>
+            <p>Track visits, signups, and critical actions across the platform.</p>
+          </div>
+          <button id="load-monitoring-btn">Refresh Monitoring</button>
+        </div>
+        <div class="report-grid" id="monitoring-summary-grid"></div>
+        <div class="admin-search-wrap">
+          <input id="monitoring-search" type="text" placeholder="Search by IP, phone, path, device..." />
+        </div>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Event</th>
+                <th>User</th>
+                <th>Role</th>
+                <th>Device</th>
+                <th>Location</th>
+                <th>ISP</th>
+                <th>IP</th>
+                <th>Path</th>
+                <th>Referrer</th>
+              </tr>
+            </thead>
+            <tbody id="monitoring-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="admin-section hidden" data-section="settings">
+        <div class="admin-toolbar">
+          <div>
+            <h3>System Settings</h3>
+            <p>Control matching radius, fare rules, commission settings, settlement instructions, and weather advice.</p>
+          </div>
+          <button id="load-settings-btn">Load Settings</button>
+        </div>
+        <div class="admin-form-wrap">
+          <div class="inline-grid">
+            <label>Service Radius KM<input id="setting-service-radius" type="number" step="0.1" /></label>
+            <label>Price per KM (TZS)<input id="setting-price-km" type="number" step="1" /></label>
+            <label>Base Fare Bodaboda (TZS)<input id="setting-base-motorcycle" type="number" step="1" /></label>
+            <label>Base Fare Bajaji (TZS)<input id="setting-base-bajaji" type="number" step="1" /></label>
+            <label>Driver Debt Limit (TZS)<input id="setting-driver-debt-limit" type="number" step="1" /></label>
+            <label>Surge Enabled
+              <select id="setting-surge-enabled">
+                <option value="false">Off</option>
+                <option value="true">On</option>
+              </select>
+            </label>
+            <label>Surge Multiplier<input id="setting-surge-multiplier" type="number" step="0.1" /></label>
+            <label>First Ride Discount %<input id="setting-first-ride-discount" type="number" step="1" /></label>
+            <label>Short Ride Max Fare (TZS)<input id="setting-commission-band-short-max" type="number" step="1" /></label>
+            <label>Short Ride Fee (TZS)<input id="setting-commission-fee-short" type="number" step="1" /></label>
+            <label>Medium Ride Max Fare (TZS)<input id="setting-commission-band-medium-max" type="number" step="1" /></label>
+            <label>Medium Ride Fee (TZS)<input id="setting-commission-fee-medium" type="number" step="1" /></label>
+            <label>Long Ride Max Fare (TZS)<input id="setting-commission-band-long-max" type="number" step="1" /></label>
+            <label>Long Ride Fee (TZS)<input id="setting-commission-fee-long" type="number" step="1" /></label>
+            <label>Extended Ride Fee (TZS)<input id="setting-commission-fee-extended" type="number" step="1" /></label>
+            <label>Settlement Provider<input id="setting-settlement-provider" /></label>
+            <label>Settlement Phone<input id="setting-settlement-phone" /></label>
+            <label>Settlement Reference Prefix<input id="setting-settlement-reference-prefix" /></label>
+            <label>Weather Advisory Enabled
+              <select id="setting-weather-enabled">
+                <option value="true">On</option>
+                <option value="false">Off</option>
+              </select>
+            </label>
+            <label>Rain Probability Alert %<input id="setting-weather-rain-probability" type="number" step="1" /></label>
+            <label>Rain Amount Alert (mm)<input id="setting-weather-rain-mm" type="number" step="0.1" /></label>
+            <label>Weather Lookahead Hours<input id="setting-weather-hours-ahead" type="number" step="1" /></label>
+          </div>
+          <button id="save-settings-btn">Save Settings</button>
+        </div>
+      </div>
+
+      <div class="admin-section hidden" data-section="promos">
+        <div class="admin-toolbar">
+          <div>
+            <h3>Promo Codes</h3>
+            <p>Create discounts and manage usage limits.</p>
+          </div>
+          <button id="load-promos-btn">Refresh Promos</button>
+        </div>
+        <div class="admin-form-wrap">
+          <h4>Create Promo</h4>
+          <div class="inline-grid">
+            <label>Code<input id="promo-code-input" /></label>
+            <label>Discount %<input id="promo-discount-input" type="number" step="1" /></label>
+            <label>Max Uses<input id="promo-max-uses-input" type="number" step="1" /></label>
+            <label>Expires At<input id="promo-expires-input" type="date" /></label>
+          </div>
+          <div class="action-row">
+            <button id="create-promo-btn" type="button">Create Promo</button>
+          </div>
+        </div>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Discount %</th>
+                <th>Uses</th>
+                <th>Expires</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="promo-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </section>
+</div>
+
+<p id="dashboard-message" class="message"></p>
+</div>
+<div id="confirm-modal" class="confirm-modal hidden" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+  <div class="confirm-card">
+    <h4 id="confirm-title">Confirm Action</h4>
+    <p id="confirm-message">Are you sure?</p>
+    <div class="action-row">
+      <button id="confirm-cancel-btn" type="button">Cancel</button>
+      <button id="confirm-ok-btn" type="button">Confirm</button>
+    </div>
+  </div>
+</div>
+<div id="admin-reschedule-modal" class="confirm-modal hidden" role="dialog" aria-modal="true" aria-labelledby="admin-reschedule-title">
+  <div class="confirm-card reschedule-card">
+    <h4 id="admin-reschedule-title">Reschedule Ride</h4>
+    <p id="admin-reschedule-message">Choose a new date and time.</p>
+    <div class="inline-grid">
+      <label>Date<input id="admin-reschedule-date" type="date" /></label>
+      <label>Time<input id="admin-reschedule-time" type="time" /></label>
+    </div>
+    <div class="action-row">
+      <button id="admin-reschedule-cancel-btn" type="button">Cancel</button>
+      <button id="admin-reschedule-ok-btn" type="button">Save</button>
+    </div>
+  </div>
+</div>
+<div id="admin-doc-modal" class="confirm-modal hidden" role="dialog" aria-modal="true" aria-labelledby="admin-doc-title">
+  <div class="confirm-card reschedule-card">
+    <h4 id="admin-doc-title">Review Driver Documents</h4>
+    <p id="admin-doc-message">Update status for driver documents.</p>
+    <div class="inline-grid">
+      <label>Document
+        <select id="admin-doc-type">
+          <option value="national_id">National ID</option>
+          <option value="license">Driver License</option>
+          <option value="vehicle_insurance">Vehicle Insurance</option>
+        </select>
+      </label>
+      <label>Status
+        <select id="admin-doc-status">
+          <option value="pending">Pending</option>
+          <option value="approved">Approved</option>
+          <option value="rejected">Rejected</option>
+        </select>
+      </label>
+      <label>Notes<input id="admin-doc-notes" placeholder="Optional notes" /></label>
+    </div>
+    <div class="action-row">
+      <button id="admin-doc-cancel-btn" type="button">Cancel</button>
+      <button id="admin-doc-save-btn" type="button">Save</button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="/static/vendor/leaflet/leaflet.js"></script>
+<script src="/static/js/dashboard.js"></script>
+{% endblock %}

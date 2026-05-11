@@ -1,0 +1,10 @@
+<libraries>
+  <library
+      name="org.jetbrains.kotlin:kotlin-stdlib:1.9.20@jar"
+      jars="/home/jarviscoder/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/1.9.20/e58b4816ac517e9cc5df1db051120c63d4cde669/kotlin-stdlib-1.9.20.jar"
+      resolved="org.jetbrains.kotlin:kotlin-stdlib:1.9.20"/>
+  <library
+      name="org.jetbrains:annotations:23.0.0@jar"
+      jars="/home/jarviscoder/.gradle/caches/modules-2/files-2.1/org.jetbrains/annotations/23.0.0/8cc20c07506ec18e0834947b84a864bfc094484e/annotations-23.0.0.jar"
+      resolved="org.jetbrains:annotations:23.0.0"/>
+</libraries>

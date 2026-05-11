@@ -1,0 +1,86 @@
+{
+    "logs": [
+        {
+            "outputFile": "/home/jarviscoder/.gradle/daemon/8.6/com.bodaboda.app-release-4:/values_values.arsc.flat",
+            "map": [
+                {
+                    "source": "/home/jarviscoder/Documents/BodaBoda App/bodaboda_android/app/src/main/res/values/themes.xml",
+                    "from": {
+                        "startLines": "1,6",
+                        "startColumns": "4,4",
+                        "startOffsets": "63,287",
+                        "endLines": "4,10",
+                        "endColumns": "12,12",
+                        "endOffsets": "281,589"
+                    },
+                    "to": {
+                        "startLines": "5,9",
+                        "startColumns": "4,4",
+                        "startOffsets": "238,461",
+                        "endLines": "8,13",
+                        "endColumns": "12,12",
+                        "endOffsets": "456,763"
+                    }
+                },
+                {
+                    "source": "/home/jarviscoder/Documents/BodaBoda App/bodaboda_android/app/src/main/res/values/colors.xml",
+                    "from": {
+                        "startLines": "1",
+                        "startColumns": "4",
+                        "startOffsets": "16",
+                        "endColumns": "43",
+                        "endOffsets": "55"
+                    },
+                    "to": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "43",
+                        "endOffsets": "94"
+                    }
+                },
+                {
+                    "source": "/home/jarviscoder/Documents/BodaBoda App/bodaboda_android/app/src/main/res/values/strings.xml",
+                    "from": {
+                        "startLines": "1,2",
+                        "startColumns": "4,4",
+                        "startOffsets": "16,61",
+                        "endColumns": "44,93",
+                        "endOffsets": "56,150"
+                    },
+                    "to": {
+                        "startLines": "3,4",
+                        "startColumns": "4,4",
+                        "startOffsets": "99,144",
+                        "endColumns": "44,93",
+                        "endOffsets": "139,233"
+                    }
+                }
+            ]
+        },
+        {
+            "outputFile": "/home/jarviscoder/.gradle/daemon/8.6/com.bodaboda.app-release-4:/values-v31_values-v31.arsc.flat",
+            "map": [
+                {
+                    "source": "/home/jarviscoder/Documents/BodaBoda App/bodaboda_android/app/src/main/res/values-v31/themes.xml",
+                    "from": {
+                        "startLines": "1",
+                        "startColumns": "4",
+                        "startOffsets": "16",
+                        "endLines": "5",
+                        "endColumns": "12",
+                        "endOffsets": "318"
+                    },
+                    "to": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endLines": "6",
+                        "endColumns": "12",
+                        "endOffsets": "357"
+                    }
+                }
+            ]
+        }
+    ]
+}

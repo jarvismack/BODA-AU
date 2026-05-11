@@ -1,0 +1,107 @@
+from django.contrib import admin
+from django.conf import settings
+from django.conf.urls.static import static
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from django.urls import path
+from django.contrib.auth import views as auth_views
+
+from core import views
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('', views.index, name='index'),
+    path('dashboard/', views.dashboard, name='dashboard'),
+    path('safety-center/', views.safety_center, name='safety_center'),
+    path('help-contact/', views.help_contact, name='help_contact'),
+    path('terms-privacy/', views.terms_privacy, name='terms_privacy'),
+    path('healthz/', views.healthz, name='healthz'),
+    path('auth/register/', views.register_view, name='register'),
+    path('auth/login/', views.login_view, name='login'),
+    path('auth/logout/', views.logout_view, name='logout'),
+    path('auth/verify-email/', views.verify_email_otp, name='verify_email_otp'),
+    path('auth/resend-otp/', views.resend_email_otp, name='resend_email_otp'),
+    path('auth/password-reset/', auth_views.PasswordResetView.as_view(), name='password_reset'),
+    path('auth/password-reset/done/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
+    path('auth/reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    path('auth/reset/done/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
+    path('receipt/<int:ride_id>/', views.ride_receipt_view, name='ride_receipt_view'),
+
+    path('api/passenger/nearby-drivers/', views.nearby_drivers, name='nearby_drivers'),
+    path('api/passenger/request-ride/', views.request_ride, name='request_ride'),
+    path('api/passenger/cancel-ride/', views.passenger_cancel_ride, name='passenger_cancel_ride'),
+    path('api/passenger/schedule-ride/', views.schedule_ride, name='schedule_ride'),
+    path('api/passenger/scheduled-rides/', views.scheduled_rides, name='scheduled_rides'),
+    path('api/passenger/scheduled-ride/cancel/', views.cancel_scheduled_ride, name='cancel_scheduled_ride'),
+    path('api/passenger/scheduled-ride/update/', views.update_scheduled_ride, name='update_scheduled_ride'),
+    path('api/passenger/weather-advisory/', views.passenger_weather_advisory, name='passenger_weather_advisory'),
+    path('api/passenger/ride-history/', views.ride_history, name='ride_history'),
+    path('api/passenger/current-ride/', views.current_ride, name='current_ride'),
+    path('api/passenger/profile/me/', views.passenger_profile_me, name='passenger_profile_me'),
+    path('api/passenger/profile/update/', views.passenger_profile_update, name='passenger_profile_update'),
+    path('api/promo/validate/', views.promo_validate, name='promo_validate'),
+    path('api/ride/receipt/', views.ride_receipt, name='ride_receipt'),
+    path('api/ride/pending-ratings/', views.pending_ratings, name='pending_ratings'),
+    path('api/ride/rate/', views.submit_rating, name='submit_rating'),
+    path('api/ride/chat/', views.ride_chat_messages, name='ride_chat_messages'),
+    path('api/ride/chat/send/', views.ride_chat_send, name='ride_chat_send'),
+    path('api/emergency-contacts/', views.emergency_contacts_list, name='emergency_contacts_list'),
+    path('api/emergency-contacts/upsert/', views.emergency_contacts_upsert, name='emergency_contacts_upsert'),
+    path('api/sos/trigger/', views.trigger_sos, name='trigger_sos'),
+
+    path('api/driver/profile/', views.upsert_driver_profile, name='driver_profile'),
+    path('api/driver/profile/me/', views.driver_profile_me, name='driver_profile_me'),
+    path('api/driver/documents/', views.driver_documents_list, name='driver_documents_list'),
+    path('api/driver/documents/upload/', views.driver_documents_upload, name='driver_documents_upload'),
+    path('api/driver/current-ride/', views.driver_current_ride, name='driver_current_ride'),
+    path('api/driver/online/', views.driver_online, name='driver_online'),
+    path('api/driver/offline/', views.driver_offline, name='driver_offline'),
+    path('api/driver/incoming-rides/', views.driver_incoming_rides, name='driver_incoming'),
+    path('api/driver/accept-ride/', views.driver_accept_ride, name='driver_accept'),
+    path('api/driver/start-ride/', views.driver_start_ride, name='driver_start'),
+    path('api/driver/complete-ride/', views.driver_complete_ride, name='driver_complete'),
+    path('api/driver/cancel-ride/', views.driver_cancel_ride, name='driver_cancel'),
+    path('api/driver/decline-ride/', views.driver_decline_ride, name='driver_decline'),
+    path('api/driver/earnings/', views.driver_earnings, name='driver_earnings'),
+
+    path('api/admin/drivers/', views.admin_drivers, name='admin_drivers'),
+    path('api/admin/passengers/', views.admin_passengers, name='admin_passengers'),
+    path('api/admin/verify-driver/', views.admin_verify_driver, name='admin_verify_driver'),
+    path('api/admin/driver-documents/review/', views.admin_driver_document_review, name='admin_driver_document_review'),
+    path('api/admin/driver/create/', views.admin_create_driver, name='admin_create_driver'),
+    path('api/admin/driver/update/', views.admin_update_driver, name='admin_update_driver'),
+    path('api/admin/driver/delete/', views.admin_delete_driver, name='admin_delete_driver'),
+    path('api/admin/driver/settlement/', views.admin_driver_settlement, name='admin_driver_settlement'),
+    path('api/admin/passenger/create/', views.admin_create_passenger, name='admin_create_passenger'),
+    path('api/admin/passenger/update/', views.admin_update_passenger, name='admin_update_passenger'),
+    path('api/admin/passenger/delete/', views.admin_delete_passenger, name='admin_delete_passenger'),
+    path('api/admin/reports/', views.admin_reports, name='admin_reports'),
+    path('api/admin/monitoring/', views.admin_monitoring, name='admin_monitoring'),
+    path('api/admin/emergency-alerts/', views.admin_emergency_alerts, name='admin_emergency_alerts'),
+    path('api/admin/scheduled-rides/', views.admin_scheduled_rides, name='admin_scheduled_rides'),
+    path('api/admin/scheduled-ride/cancel/', views.admin_cancel_scheduled_ride, name='admin_cancel_scheduled_ride'),
+    path('api/admin/scheduled-ride/update/', views.admin_update_scheduled_ride, name='admin_update_scheduled_ride'),
+    path('api/admin/promos/', views.admin_promos, name='admin_promos'),
+    path('api/admin/promos/create/', views.admin_create_promo, name='admin_create_promo'),
+    path('api/admin/promos/toggle/', views.admin_toggle_promo, name='admin_toggle_promo'),
+    path('api/admin/settings/', views.admin_settings, name='admin_settings'),
+    path('api/admin/settings/update/', views.admin_update_settings, name='admin_update_settings'),
+    path('api/admin/station-requests/', views.admin_station_requests, name='admin_station_requests'),
+    path('api/admin/station-requests/approve/', views.admin_station_request_approve, name='admin_station_request_approve'),
+    path('api/locations/', views.locations_list, name='locations_list'),
+    path('api/station-requests/', views.station_request_create, name='station_request_create'),
+    path('api/geo/search/', views.geo_search, name='geo_search'),
+
+    path('api/notifications/', views.notifications_list, name='notifications_list'),
+    path('api/notifications/mark-read/', views.notifications_mark_read, name='notifications_mark_read'),
+    path('api/notifications/clear/', views.notifications_clear, name='notifications_clear'),
+    path('api/push/tokens/', views.push_device_tokens_list, name='push_device_tokens_list'),
+    path('api/push/tokens/register/', views.push_device_tokens_register, name='push_device_tokens_register'),
+    path('api/push/tokens/deactivate/', views.push_device_tokens_deactivate, name='push_device_tokens_deactivate'),
+    path('app/version.json', views.app_version, name='app_version'),
+    path('api/profile/delete/', views.delete_account, name='delete_account'),
+]
+
+if settings.SERVE_MEDIA_INSECURE:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+if settings.SERVE_STATIC_INSECURE:
+    urlpatterns += staticfiles_urlpatterns()

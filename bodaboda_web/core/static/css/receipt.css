@@ -1,0 +1,96 @@
+body {
+  font-family: "Trebuchet MS", Arial, sans-serif;
+  background: #f8fafc;
+  margin: 0;
+  padding: 24px;
+  color: #0f172a;
+}
+
+.receipt {
+  max-width: 720px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.brand {
+  font-weight: 900;
+  font-size: 20px;
+  letter-spacing: 0.08em;
+}
+
+.meta {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  margin: 8px 0;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.section {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.badge {
+  display: inline-block;
+  background: #e0f2fe;
+  color: #0369a1;
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+.total {
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.print {
+  margin-top: 18px;
+  text-align: right;
+}
+
+.print button {
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: none;
+  background: #16a34a;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+@media print {
+  .print {
+    display: none;
+  }
+
+  body {
+    background: #fff;
+    padding: 0;
+  }
+
+  .receipt {
+    box-shadow: none;
+    border-radius: 0;
+  }
+}

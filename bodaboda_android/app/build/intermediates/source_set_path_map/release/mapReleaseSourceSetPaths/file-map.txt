@@ -1,0 +1,7 @@
+com.bodaboda.app-pngs-0 /home/jarviscoder/Documents/BodaBoda App/bodaboda_android/app/build/generated/res/pngs/release
+com.bodaboda.app-resValues-1 /home/jarviscoder/Documents/BodaBoda App/bodaboda_android/app/build/generated/res/resValues/release
+com.bodaboda.app-packageReleaseResources-2 /home/jarviscoder/Documents/BodaBoda App/bodaboda_android/app/build/intermediates/incremental/release/packageReleaseResources/merged.dir
+com.bodaboda.app-packageReleaseResources-3 /home/jarviscoder/Documents/BodaBoda App/bodaboda_android/app/build/intermediates/incremental/release/packageReleaseResources/stripped.dir
+com.bodaboda.app-release-4 /home/jarviscoder/Documents/BodaBoda App/bodaboda_android/app/build/intermediates/merged_res/release/mergeReleaseResources
+com.bodaboda.app-main-5 /home/jarviscoder/Documents/BodaBoda App/bodaboda_android/app/src/main/res
+com.bodaboda.app-release-6 /home/jarviscoder/Documents/BodaBoda App/bodaboda_android/app/src/release/res

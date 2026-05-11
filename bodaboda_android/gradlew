@@ -1,0 +1,47 @@
+#!/usr/bin/env sh
+
+set -eu
+
+SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+PROPERTIES_FILE="$SCRIPT_DIR/gradle/wrapper/gradle-wrapper.properties"
+DISTRIBUTION_URL="$(sed -n 's/^distributionUrl=//p' "$PROPERTIES_FILE" | head -n 1 | sed 's#\\:#:#g')"
+DISTRIBUTION_ZIP="$(basename "$DISTRIBUTION_URL")"
+DISTRIBUTION_NAME="${DISTRIBUTION_ZIP%.zip}"
+DISTRIBUTION_DIR="${DISTRIBUTION_NAME%-bin}"
+DISTRIBUTION_DIR="${DISTRIBUTION_DIR%-all}"
+
+DEFAULT_GRADLE_USER_HOME="${GRADLE_USER_HOME:-${HOME:-}}"
+if [ -z "$DEFAULT_GRADLE_USER_HOME" ] || [ ! -w "$DEFAULT_GRADLE_USER_HOME" ]; then
+  DEFAULT_GRADLE_USER_HOME="$SCRIPT_DIR/.gradle"
+fi
+GRADLE_USER_HOME="${GRADLE_USER_HOME:-$DEFAULT_GRADLE_USER_HOME}"
+
+DIST_ROOT="$GRADLE_USER_HOME/wrapper/dists/$DISTRIBUTION_NAME"
+INSTALL_DIR="$DIST_ROOT/$DISTRIBUTION_DIR"
+ZIP_FILE="$DIST_ROOT/$DISTRIBUTION_ZIP"
+
+ensure_distribution() {
+  if [ -x "$INSTALL_DIR/bin/gradle" ]; then
+    return 0
+  fi
+
+  mkdir -p "$DIST_ROOT"
+
+  if [ ! -f "$ZIP_FILE" ]; then
+    if command -v curl >/dev/null 2>&1; then
+      curl -fsSL "$DISTRIBUTION_URL" -o "$ZIP_FILE"
+    elif command -v wget >/dev/null 2>&1; then
+      wget -qO "$ZIP_FILE" "$DISTRIBUTION_URL"
+    else
+      echo "curl or wget is required to download Gradle" >&2
+      exit 1
+    fi
+  fi
+
+  rm -rf "$INSTALL_DIR"
+  unzip -q "$ZIP_FILE" -d "$DIST_ROOT"
+}
+
+ensure_distribution
+
+exec "$INSTALL_DIR/bin/gradle" "$@"

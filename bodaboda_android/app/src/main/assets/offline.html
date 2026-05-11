@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Offline</title>
+  <style>
+    body { margin: 0; font-family: Arial, sans-serif; background: #0f172a; color: #f8fafc; display: grid; place-items: center; min-height: 100vh; }
+    .card { max-width: 420px; background: #111827; border-radius: 20px; padding: 28px; box-shadow: 0 20px 40px rgba(0,0,0,0.35); text-align: center; }
+    h1 { margin: 0 0 8px; font-size: 24px; }
+    p { margin: 0 0 20px; color: #cbd5f5; }
+    button { background: #00d084; color: #0f172a; border: none; padding: 12px 18px; border-radius: 999px; font-weight: 700; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>You’re offline</h1>
+    <p>Check your connection and try again.</p>
+    <button onclick="location.href='app://retry'">Retry</button>
+  </div>
+</body>
+</html>

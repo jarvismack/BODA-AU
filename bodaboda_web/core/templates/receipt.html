@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ride Receipt</title>
+    <link rel="stylesheet" href="/static/css/receipt.css" />
+  </head>
+  <body>
+    <div class="receipt">
+      <div class="header">
+        <div class="brand">BODA AU</div>
+        <div class="meta">Ride #{{ ride.id }} · {{ ride.created_at }}</div>
+      </div>
+      <div class="row"><span>Status</span><span class="badge">{{ ride.status }}</span></div>
+      <div class="row"><span>Vehicle</span><span>{{ ride.requested_vehicle_type }}</span></div>
+      <div class="row"><span>Pickup</span><span>{{ ride.pickup_location_name }}</span></div>
+      <div class="row"><span>Dropoff</span><span>{{ ride.dropoff_location_name }}</span></div>
+      {% if stops %}
+        <div class="row"><span>Stops</span><span>{% for stop in stops %}{{ stop.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</span></div>
+      {% endif %}
+
+      <div class="section">
+        <div class="row"><span>Distance</span><span>{{ ride.distance_km }} km</span></div>
+        <div class="row"><span>Base Fare</span><span>{{ breakdown.base_fare }} TZS</span></div>
+        <div class="row"><span>Price per KM</span><span>{{ breakdown.price_per_km }} TZS</span></div>
+        <div class="row"><span>Raw Fare</span><span>{{ breakdown.raw_fare }} TZS</span></div>
+        <div class="row"><span>Surge Multiplier</span><span>x {{ breakdown.surge_multiplier }}</span></div>
+        <div class="row"><span>Surged Fare</span><span>{{ breakdown.surged_fare }} TZS</span></div>
+        {% if breakdown.promo_code %}
+          <div class="row"><span>Promo Code</span><span>{{ breakdown.promo_code }}</span></div>
+        {% endif %}
+        <div class="row"><span>Discount</span><span>-{{ breakdown.discount_amount }} TZS</span></div>
+      </div>
+
+      <div class="section">
+        <div class="row total"><span>Total</span><span>{{ breakdown.final_fare }} TZS</span></div>
+      </div>
+      <div class="print">
+        <button id="receipt-print-btn" type="button">Download / Print</button>
+      </div>
+    </div>
+    <script src="/static/js/receipt.js"></script>
+  </body>
+</html>

@@ -1,0 +1,15 @@
+com.bodaboda.app:drawable/ic_splash_logo = 0x7f020003
+com.bodaboda.app:string/app_name = 0x7f060000
+com.bodaboda.app:mipmap/ic_launcher = 0x7f050000
+com.bodaboda.app:xml/network_security_config = 0x7f080000
+com.bodaboda.app:mipmap/ic_launcher_round = 0x7f050001
+com.bodaboda.app:id/webview = 0x7f030000
+com.bodaboda.app:drawable/splash_screen = 0x7f020004
+com.bodaboda.app:style/Theme.BodaAU.Splash = 0x7f070001
+com.bodaboda.app:drawable/ic_launcher_foreground = 0x7f020002
+com.bodaboda.app:string/base_url = 0x7f060001
+com.bodaboda.app:drawable/ic_launcher_background = 0x7f020001
+com.bodaboda.app:style/Theme.BodaAU = 0x7f070000
+com.bodaboda.app:layout/activity_main = 0x7f040000
+com.bodaboda.app:drawable/app_icon = 0x7f020000
+com.bodaboda.app:color/splash_bg = 0x7f010000

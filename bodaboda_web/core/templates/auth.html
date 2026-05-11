@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+{% block extra_head %}
+<script>
+  (function () {
+    try {
+      if (localStorage.getItem('boda_intro_seen') === '1') {
+        document.documentElement.classList.add('auth-returning');
+      }
+    } catch (err) {
+      // Local storage is optional; fail closed to the intro screen.
+    }
+  })();
+</script>
+{% endblock %}
+{% block content %}
+<section class="intro-scene" id="intro-scene">
+  <div class="intro-shell">
+    <div class="intro-top">
+      <p class="intro-kicker" data-i18n="intro_kicker">BODA AU Pre-Launch</p>
+      <div class="intro-progress">
+        <span class="intro-progress-bar" id="intro-progress-bar"></span>
+      </div>
+    </div>
+
+    <div class="intro-track-wrap">
+      <article class="intro-slide active" data-intro-step="1">
+        <div class="intro-visual visual-account">01</div>
+        <h2 data-i18n="intro_slide_1_title">Create an account</h2>
+        <p data-i18n="intro_slide_1_copy">Register as either a passenger or driver in one secure flow and enter the platform instantly.</p>
+      </article>
+
+      <article class="intro-slide" data-intro-step="2">
+        <div class="intro-visual visual-request">02</div>
+        <h2 data-i18n="intro_slide_2_title">Request your ride</h2>
+        <p data-i18n="intro_slide_2_copy">Choose your pickup and dropoff from active Zanzibar routes and send your request in seconds.</p>
+      </article>
+
+      <article class="intro-slide" data-intro-step="3">
+        <div class="intro-visual visual-driver">03</div>
+        <h2 data-i18n="intro_slide_3_title">Choose your driver</h2>
+        <p data-i18n="intro_slide_3_copy">View nearby driver details and match with confidence using real profile and vehicle information.</p>
+      </article>
+
+      <article class="intro-slide" data-intro-step="4">
+        <div class="intro-visual visual-safe">04</div>
+        <h2 data-i18n="intro_slide_4_title">Stay safe on your ride</h2>
+        <p data-i18n="intro_slide_4_copy">Track status updates live, confirm identity details, and use direct call actions during your trip.</p>
+      </article>
+
+      <article class="intro-slide" data-intro-step="5">
+        <div class="intro-visual visual-courier">05</div>
+        <h2 data-i18n="intro_slide_5_title">Find Courier</h2>
+        <p data-i18n="intro_slide_5_copy">Use BODA AU for quick courier requests like gas cylinders and luggage transfers across the city.</p>
+      </article>
+    </div>
+
+    <div class="intro-footer">
+      <div class="intro-dots" id="intro-dots">
+        <button class="intro-dot active" data-dot-index="0" type="button" aria-label="Slide 1"></button>
+        <button class="intro-dot" data-dot-index="1" type="button" aria-label="Slide 2"></button>
+        <button class="intro-dot" data-dot-index="2" type="button" aria-label="Slide 3"></button>
+        <button class="intro-dot" data-dot-index="3" type="button" aria-label="Slide 4"></button>
+        <button class="intro-dot" data-dot-index="4" type="button" aria-label="Slide 5"></button>
+      </div>
+      <div class="intro-actions">
+        <button id="intro-skip-btn" class="intro-ghost-btn" type="button" data-i18n="intro_skip">Skip</button>
+        <button id="intro-prev-btn" class="intro-ghost-btn" type="button" data-i18n="intro_back">Back</button>
+        <button id="intro-next-btn" type="button" data-i18n="intro_next">Next</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="auth-scene hidden" id="auth-scene">
+  <div class="auth-shell" id="auth-shell">
+    <div class="auth-forms">
+      <section class="auth-panel" id="login-panel">
+        <p class="auth-kicker" data-i18n="auth_brand">Zanzibar Bodaboda</p>
+        <h2 data-i18n="auth_sign_in_title">Sign in to Account</h2>
+        <p class="auth-copy" data-i18n="auth_sign_in_copy">Use your phone number and password to continue.</p>
+        <label><span data-i18n="auth_phone">Phone Number</span><input id="login-phone" type="text" /></label>
+        <label><span data-i18n="auth_password">Password</span>
+          <div class="password-field password-field-grid">
+            <input id="login-password" type="password" />
+            <button class="password-toggle" type="button" data-target="login-password" aria-label="Show password">
+              <span class="toggle-icon" aria-hidden="true"></span>
+            </button>
+          </div>
+        </label>
+        <button id="login-btn" data-i18n="auth_sign_in_btn">Sign In</button>
+        <a class="auth-link" href="/auth/password-reset/" data-i18n="auth_forgot">Forgot password?</a>
+      </section>
+
+      <section class="auth-panel hidden" id="register-panel">
+        <p class="auth-kicker" data-i18n="auth_register_btn">Create Account</p>
+        <h2 data-i18n="auth_join_title">Join Zanzibar Bodaboda</h2>
+        <p class="auth-copy" data-i18n="auth_join_copy">Create a passenger or driver account in under a minute.</p>
+        <label><span data-i18n="auth_full_name">Full Name</span><input id="register-name" type="text" /></label>
+        <label><span data-i18n="auth_email">Email</span><input id="register-email" type="email" /></label>
+        <label><span data-i18n="auth_phone">Phone Number</span><input id="register-phone" type="text" /></label>
+        <label><span data-i18n="auth_password">Password</span>
+          <div class="password-field password-field-grid">
+            <input id="register-password" type="password" />
+            <button class="password-toggle" type="button" data-target="register-password" aria-label="Show password">
+              <span class="toggle-icon" aria-hidden="true"></span>
+            </button>
+          </div>
+        </label>
+        <label><span data-i18n="auth_role">Role</span>
+          <select id="register-role">
+            <option value="passenger" data-i18n="auth_role_passenger">Passenger</option>
+            <option value="driver" data-i18n="auth_role_driver">Driver</option>
+          </select>
+        </label>
+        <div id="driver-station-group" class="driver-station hidden">
+          <label><span>Driver Station (Stand Area)</span>
+            <input id="register-station" type="text" placeholder="e.g. Stone Town" list="station-list" />
+            <datalist id="station-list">
+              <option value="Stone Town"></option>
+              <option value="Malindi"></option>
+              <option value="Forodhani"></option>
+              <option value="Darajani"></option>
+              <option value="Mlandege"></option>
+              <option value="Amaan Stadium"></option>
+              <option value="Chukwani"></option>
+              <option value="Kisauni Airport"></option>
+              <option value="Fumba"></option>
+              <option value="Bweleo"></option>
+              <option value="Dunga"></option>
+              <option value="Mwera"></option>
+              <option value="Mangapwani"></option>
+              <option value="Mkokotoni"></option>
+              <option value="Nungwi"></option>
+              <option value="Kendwa"></option>
+              <option value="Kiwengwa"></option>
+              <option value="Matemwe"></option>
+              <option value="Paje"></option>
+              <option value="Jambiani"></option>
+              <option value="Michamvi"></option>
+              <option value="Chwaka"></option>
+              <option value="Makunduchi"></option>
+              <option value="Kwanyanya"></option>
+              <option value="Mbuzini Hospital"></option>
+              <option value="Njia ya Kama"></option>
+              <option value="Bububu Skuli"></option>
+              <option value="Kidichi"></option>
+              <option value="Njia ya Bumbwini"></option>
+            </datalist>
+          </label>
+          <div class="station-verify">
+            <span id="station-verify-badge" class="station-badge pending">Not verified yet</span>
+          </div>
+        </div>
+        <button id="register-btn" data-i18n="auth_register_btn">Create Account</button>
+      </section>
+    </div>
+
+    <aside class="auth-aside">
+      <div class="auth-aside-content">
+        <h3 id="aside-title" data-i18n="auth_aside_title_signup">Hello, Friend!</h3>
+        <p id="aside-copy" data-i18n="auth_aside_copy_signup">Fill in your details and start your Zanzibar journey with us.</p>
+        <button class="outline-btn" id="switch-auth-mode" data-i18n="auth_switch_signup">Sign Up</button>
+      </div>
+    </aside>
+  </div>
+</section>
+<p id="auth-message" class="message"></p>
+<div id="otp-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+  <div class="modal-card">
+    <h4 data-i18n="otp_title">Verify Email</h4>
+    <p data-i18n="otp_copy">Enter the OTP sent to your email to activate your account.</p>
+    <label><span data-i18n="auth_email">Email</span><input id="otp-email" type="email" /></label>
+    <label><span data-i18n="otp_code">OTP Code</span><input id="otp-code" type="text" /></label>
+    <button id="otp-verify-btn" class="primary-btn" data-i18n="otp_verify">Verify</button>
+    <button id="otp-resend-btn" class="secondary-btn" data-i18n="otp_resend" type="button">Resend OTP</button>
+  </div>
+</div>
+<div id="station-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+  <div class="modal-card">
+    <h4>Choose Closest Station</h4>
+    <p>Please select one of the closest known Zanzibar stations.</p>
+    <div id="station-suggestions" class="station-suggestions"></div>
+    <div class="action-row">
+      <button id="station-request-btn" class="secondary-btn" type="button">Request New Station</button>
+      <button id="station-cancel-btn" class="secondary-btn" type="button">Cancel</button>
+    </div>
+  </div>
+</div>
+<div id="station-request-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+  <div class="modal-card">
+    <h4>Request a New Station</h4>
+    <p>We will review and add it to Zanzibar locations.</p>
+    <label><span>Station Name</span><input id="station-request-name" type="text" /></label>
+    <label><span>Phone Number</span><input id="station-request-phone" type="text" /></label>
+    <label><span>Email</span><input id="station-request-email" type="email" /></label>
+    <div class="action-row">
+      <button id="station-request-submit" type="button">Submit Request</button>
+      <button id="station-request-cancel" class="secondary-btn" type="button">Cancel</button>
+    </div>
+  </div>
+</div>
+<script src="/static/js/auth.js"></script>
+{% endblock %}

@@ -1,0 +1,76 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+}
+
+import java.util.Properties
+
+configurations.configureEach {
+    resolutionStrategy.eachDependency { details ->
+        if (details.requested.group == 'org.jetbrains.kotlin' && (
+                details.requested.name == 'kotlin-stdlib'
+                || details.requested.name == 'kotlin-stdlib-jdk7'
+                || details.requested.name == 'kotlin-stdlib-jdk8'
+                || details.requested.name == 'kotlin-stdlib-common'
+        )) {
+            details.useVersion '1.9.20'
+        } else if (details.requested.group == 'org.jetbrains' && details.requested.name == 'annotations') {
+            details.useVersion '23.0.0'
+        }
+    }
+}
+
+android {
+    namespace 'com.bodaboda.app'
+    compileSdk 35
+    buildFeatures {
+        buildConfig true
+    }
+
+    defaultConfig {
+        applicationId "com.bodaboda.app"
+        minSdk 24
+        targetSdk 35
+        versionCode 3
+        versionName "1.2"
+    }
+
+    def keystorePropsFile = rootProject.file("keystore.properties")
+    def keystoreProps = new Properties()
+    if (keystorePropsFile.exists()) {
+        keystoreProps.load(new FileInputStream(keystorePropsFile))
+        signingConfigs {
+            release {
+                storeFile file(keystoreProps['storeFile'])
+                storePassword keystoreProps['storePassword']
+                keyAlias keystoreProps['keyAlias']
+                keyPassword keystoreProps['keyPassword']
+            }
+        }
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled false
+        }
+        release {
+            minifyEnabled false
+            if (keystorePropsFile.exists()) {
+                signingConfig signingConfigs.release
+            }
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+}
+
+dependencies {
+}

@@ -1,0 +1,28 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.bodaboda.app-mergeReleaseResources-2:/values-v31/values-v31.xml",
+            "map": [
+                {
+                    "source": "/home/jarviscoder/Documents/BodaBoda App/bodaboda_android/app/src/main/res/values-v31/themes.xml",
+                    "from": {
+                        "startLines": "1",
+                        "startColumns": "4",
+                        "startOffsets": "16",
+                        "endLines": "5",
+                        "endColumns": "12",
+                        "endOffsets": "318"
+                    },
+                    "to": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endLines": "6",
+                        "endColumns": "12",
+                        "endOffsets": "357"
+                    }
+                }
+            ]
+        }
+    ]
+}
