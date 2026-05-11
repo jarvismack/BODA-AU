@@ -10,6 +10,16 @@ from django.http import HttpRequest, JsonResponse, HttpResponseForbidden
 logger = logging.getLogger('core.security')
 
 
+class RequestIDLogFilter(logging.Filter):
+    """Log filter that adds request_id to log records."""
+    
+    def filter(self, record):
+        # Try to get request_id from the current request context
+        # This is a simplified approach; in production you might use contextvars
+        record.request_id = getattr(record, 'request_id', 'no-request-id')
+        return True
+
+
 def get_client_ip(request: HttpRequest) -> str:
     trust_forwarded = bool(getattr(settings, 'TRUST_X_FORWARDED_FOR', False))
     forwarded = request.META.get('HTTP_X_FORWARDED_FOR', '')
