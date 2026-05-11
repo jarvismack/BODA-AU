@@ -41,7 +41,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', '')
 if not SECRET_KEY and not DEBUG:
     raise ImproperlyConfigured('SECRET_KEY must be configured in production (set DEBUG=false)')
 
-ALLOWED_HOSTS = _env_list('ALLOWED_HOSTS', '127.0.0.1,localhost,0.0.0.0')
+ALLOWED_HOSTS = _env_list('ALLOWED_HOSTS', 'https://boda-au.onrender.com')
 NGROK_DOMAIN = os.getenv('NGROK_DOMAIN', '').strip()
 if NGROK_DOMAIN and NGROK_DOMAIN not in ALLOWED_HOSTS:
     ALLOWED_HOSTS.append(NGROK_DOMAIN)
