@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from urllib.parse import urlparse, unquote
 
 from django.core.exceptions import ImproperlyConfigured
 
@@ -35,13 +36,46 @@ def _env_list(name: str, default: str = '') -> list[str]:
     return [item.strip() for item in raw.split(',') if item.strip()]
 
 
+def _database_config_from_url(database_url: str) -> dict[str, object]:
+    parsed = urlparse(database_url)
+    engine_map = {
+        'postgres': 'django.db.backends.postgresql',
+        'postgresql': 'django.db.backends.postgresql',
+        'pgsql': 'django.db.backends.postgresql',
+        'sqlite': 'django.db.backends.sqlite3',
+    }
+    engine = engine_map.get(parsed.scheme)
+    if not engine:
+        raise ImproperlyConfigured(f'Unsupported DATABASE_URL scheme: {parsed.scheme}')
+
+    if engine == 'django.db.backends.sqlite3':
+        db_path = parsed.path or '/db.sqlite3'
+        return {
+            'ENGINE': engine,
+            'NAME': unquote(db_path.lstrip('/')) or 'db.sqlite3',
+        }
+
+    return {
+        'ENGINE': engine,
+        'NAME': unquote((parsed.path or '').lstrip('/')),
+        'USER': unquote(parsed.username or ''),
+        'PASSWORD': unquote(parsed.password or ''),
+        'HOST': parsed.hostname or '',
+        'PORT': parsed.port or 5432,
+        'CONN_MAX_AGE': int(os.getenv('DB_CONN_MAX_AGE', '0' if DEBUG else '60')),
+    }
+
+
 DEBUG = _env_bool('DEBUG', False)
 
 SECRET_KEY = os.getenv('SECRET_KEY', '')
 if not SECRET_KEY and not DEBUG:
     raise ImproperlyConfigured('SECRET_KEY must be configured in production (set DEBUG=false)')
 
-ALLOWED_HOSTS = _env_list('ALLOWED_HOSTS', 'https://boda-au.onrender.com')
+ALLOWED_HOSTS = _env_list('ALLOWED_HOSTS', 'boda-au.onrender.com,localhost,127.0.0.1')
+render_hostname = os.getenv('RENDER_EXTERNAL_HOSTNAME', '').strip()
+if render_hostname and render_hostname not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append(render_hostname)
 NGROK_DOMAIN = os.getenv('NGROK_DOMAIN', '').strip()
 if NGROK_DOMAIN and NGROK_DOMAIN not in ALLOWED_HOSTS:
     ALLOWED_HOSTS.append(NGROK_DOMAIN)
@@ -51,6 +85,10 @@ if not DEBUG and not ALLOWED_HOSTS:
     raise ImproperlyConfigured('ALLOWED_HOSTS must be configured when DEBUG is false')
 
 CSRF_TRUSTED_ORIGINS = _env_list('CSRF_TRUSTED_ORIGINS', '')
+if render_hostname:
+    render_origin = f'https://{render_hostname}'
+    if render_origin not in CSRF_TRUSTED_ORIGINS:
+        CSRF_TRUSTED_ORIGINS.append(render_origin)
 ADMIN_ALLOWED_IPS = _env_list('ADMIN_ALLOWED_IPS', '')
 MONITORING_ENABLED = _env_bool('MONITORING_ENABLED', True)
 GEOIP_CITY_DB = os.getenv('GEOIP_CITY_DB', '').strip()
@@ -80,6 +118,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'bodaboda_web.urls'
 WSGI_APPLICATION = 'bodaboda_web.wsgi.application'
+ASGI_APPLICATION = 'bodaboda_web.asgi.application'
 
 TEMPLATES = [
     {
@@ -237,3 +276,15 @@ LOGGING = {
 }
 
 DATABASE_CONN_MAX_AGE = int(os.getenv('DB_CONN_MAX_AGE', '0' if DEBUG else '60'))
+DATABASE_URL = os.getenv('DATABASE_URL', '').strip()
+if DATABASE_URL:
+    DATABASES = {
+        'default': _database_config_from_url(DATABASE_URL)
+    }
+elif 'DATABASES' not in globals():
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }

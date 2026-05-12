@@ -1,2 +1,2 @@
 release: python manage.py migrate
-web: gunicorn bodaboda_web.wsgi --log-file -
+web: python -m gunicorn bodaboda_web.asgi:application -k uvicorn.workers.UvicornWorker

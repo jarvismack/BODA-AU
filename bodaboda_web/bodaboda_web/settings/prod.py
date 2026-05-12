@@ -45,6 +45,7 @@ ROOT_URLCONF = 'bodaboda_web.urls'
 # =========================
 # DATABASE CONFIG
 # =========================
+DATABASE_URL = os.getenv('DATABASE_URL', '').strip()
 DB_ENGINE = os.getenv('DB_ENGINE', 'django.db.backends.postgresql')
 DB_NAME = os.getenv('DB_NAME', '')
 DB_HOST = os.getenv('DB_HOST', '')
@@ -52,17 +53,11 @@ DB_USER = os.getenv('DB_USER', '')
 DB_PASSWORD = os.getenv('DB_PASSWORD', '')
 DB_PORT = os.getenv('DB_PORT', '5432')
 
-# If PostgreSQL credentials are not provided, use SQLite (for initial deployment)
-if not all([DB_NAME, DB_HOST, DB_USER]):
-    print("WARNING: PostgreSQL credentials not fully set. Using SQLite for initial deployment.")
-    print("To use PostgreSQL, set DB_NAME, DB_HOST, DB_USER, DB_PASSWORD env vars.")
+if DATABASE_URL:
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
+        'default': _database_config_from_url(DATABASE_URL)
     }
-else:
+elif all([DB_NAME, DB_HOST, DB_USER]):
     DATABASES = {
         'default': {
             'ENGINE': DB_ENGINE,
@@ -75,6 +70,14 @@ else:
             'OPTIONS': {
                 'connect_timeout': 10,
             }
+        }
+    }
+else:
+    print("WARNING: DATABASE_URL or PostgreSQL credentials not fully set. Using SQLite for initial deployment.")
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
 
@@ -97,6 +100,14 @@ MIDDLEWARE = [
 # STATIC FILES (RENDER SAFE)
 # =========================
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STORAGES = {
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+    },
+    'staticfiles': {
+        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+    },
+}
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')

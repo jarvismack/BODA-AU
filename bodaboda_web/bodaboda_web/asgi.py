@@ -1,7 +1,8 @@
 import os
 import sys
 from pathlib import Path
-from django.core.wsgi import get_wsgi_application
+
+from django.core.asgi import get_asgi_application
 
 BASE_DIR = Path(__file__).resolve().parents[1]
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -13,14 +14,11 @@ def ensure_path(path: Path) -> None:
         sys.path.insert(0, resolved)
 
 
-# WSGI servers do not always start with the Django project as the working
-# directory, so make both the project root and repository root importable.
+# ASGI servers may start outside the Django project directory, so make both
+# the Django app root and repository root importable before loading settings.
 ensure_path(BASE_DIR)
 ensure_path(REPO_ROOT)
 
-os.environ.setdefault(
-    'DJANGO_SETTINGS_MODULE',
-    'bodaboda_web.settings.prod'
-)
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'bodaboda_web.settings.prod')
 
-application = get_wsgi_application()
+application = get_asgi_application()
