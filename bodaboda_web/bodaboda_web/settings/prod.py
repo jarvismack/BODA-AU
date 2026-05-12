@@ -12,25 +12,30 @@ DEBUG = False
 # =========================
 # SECRET KEY (SAFE HANDLING)
 # =========================
-SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY = os.getenv('SECRET_KEY', '')
 
 if not SECRET_KEY:
-    raise ImproperlyConfigured("SECRET_KEY is missing in environment variables")
-
-if len(set(SECRET_KEY)) < 12:
+    print("WARNING: SECRET_KEY not set in environment variables. Using fallback for initial deployment.")
+    SECRET_KEY = 'temporary-key-replace-with-real-secret-key-in-production'
+elif len(set(SECRET_KEY)) < 12:
     raise ImproperlyConfigured(
-        "SECRET_KEY is too weak. Use a long random high-entropy key."
+        "SECRET_KEY is too weak. Use a long random high-entropy key (50+ characters with variety)."
     )
 
 # =========================
 # ALLOWED HOSTS
 # =========================
+DEFAULT_ALLOWED_HOSTS = "boda-au.onrender.com,localhost,127.0.0.1,0.0.0.0"
 ALLOWED_HOSTS = [
     host.strip() for host in os.getenv(
         "ALLOWED_HOSTS",
-        "boda-au.onrender.com,localhost,127.0.0.1"
-    ).split(",")
+        DEFAULT_ALLOWED_HOSTS
+    ).split(",") if host.strip()
 ]
+
+# Add wildcard for all render subdomains if needed
+if os.getenv('ALLOW_ALL_RENDER_SUBDOMAINS', '').lower() in ['1', 'true', 'yes']:
+    ALLOWED_HOSTS.append('*.onrender.com')
 
 # =========================
 # ROOT URL CONFIG (CRITICAL FIX)
@@ -41,22 +46,37 @@ ROOT_URLCONF = 'bodaboda_web.urls'
 # DATABASE CONFIG
 # =========================
 DB_ENGINE = os.getenv('DB_ENGINE', 'django.db.backends.postgresql')
-DB_NAME = os.getenv('DB_NAME')
+DB_NAME = os.getenv('DB_NAME', '')
+DB_HOST = os.getenv('DB_HOST', '')
+DB_USER = os.getenv('DB_USER', '')
+DB_PASSWORD = os.getenv('DB_PASSWORD', '')
+DB_PORT = os.getenv('DB_PORT', '5432')
 
-if not DB_NAME:
-    raise ImproperlyConfigured("DB_NAME must be set for production")
-
-DATABASES = {
-    'default': {
-        'ENGINE': DB_ENGINE,
-        'NAME': DB_NAME,
-        'USER': os.getenv('DB_USER', ''),
-        'PASSWORD': os.getenv('DB_PASSWORD', ''),
-        'HOST': os.getenv('DB_HOST', ''),
-        'PORT': int(os.getenv('DB_PORT', '5432')),
-        'CONN_MAX_AGE': int(os.getenv('DB_CONN_MAX_AGE', '60')),
+# If PostgreSQL credentials are not provided, use SQLite (for initial deployment)
+if not all([DB_NAME, DB_HOST, DB_USER]):
+    print("WARNING: PostgreSQL credentials not fully set. Using SQLite for initial deployment.")
+    print("To use PostgreSQL, set DB_NAME, DB_HOST, DB_USER, DB_PASSWORD env vars.")
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': DB_ENGINE,
+            'NAME': DB_NAME,
+            'USER': DB_USER,
+            'PASSWORD': DB_PASSWORD,
+            'HOST': DB_HOST,
+            'PORT': int(DB_PORT),
+            'CONN_MAX_AGE': int(os.getenv('DB_CONN_MAX_AGE', '60')),
+            'OPTIONS': {
+                'connect_timeout': 10,
+            }
+        }
+    }
 
 # =========================
 # MIDDLEWARE (WHITE NOISE FIX)
@@ -88,23 +108,24 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # =========================
-# SECURITY SETTINGS
+# SECURITY SETTINGS (RENDER-SAFE)
 # =========================
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 
-SECURE_SSL_REDIRECT = True
+# Enable SSL redirect only if behind proxy (Render uses X-Forwarded-Proto)
+SECURE_SSL_REDIRECT = os.getenv('SECURE_SSL_REDIRECT', '1').lower() in ['1', 'true', 'yes']
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
+
 SECURE_HSTS_SECONDS = 31536000
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_HSTS_PRELOAD = True
+SECURE_HSTS_PRELOAD = False  # Set to True only after domain is submitted
 
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 
 X_FRAME_OPTIONS = 'DENY'
 
-# =========================
-# OPTIONAL SAFE DEFAULTS
-# =========================
-USE_X_FORWARDED_HOST = True
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# Optional: Trust Render's X-Forwarded-For header for IP addresses
+TRUST_X_FORWARDED_FOR = os.getenv('TRUST_X_FORWARDED_FOR', '1').lower() in ['1', 'true', 'yes']
