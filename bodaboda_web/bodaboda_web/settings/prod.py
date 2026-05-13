@@ -2,6 +2,7 @@ import os
 from django.core.exceptions import ImproperlyConfigured
 
 from .base import *
+from .base import _database_config_from_url
 
 # =========================
 # PRODUCTION SETTINGS

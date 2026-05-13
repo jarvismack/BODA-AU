@@ -2,7 +2,7 @@ services:
   - type: web
     name: bodaboda-web
     runtime: python
-    runtimeVersion: 3.11
+    runtimeVersion: 3.12.3
     rootDir: bodaboda_web
     startCommand: gunicorn bodaboda_web.wsgi:application --log-file - --access-logfile - --workers 2
     buildCommand: python manage.py migrate && python manage.py collectstatic --noinput

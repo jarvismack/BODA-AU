@@ -356,12 +356,12 @@ svg.leaflet-image-layer.leaflet-interactive path {
 	border-radius: 5px;
 	}
 .leaflet-control-layers-toggle {
-	background-image: url(images/layers.png);
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 26 26'%3E%3Cpath fill='%23666' d='M13 3 3 8l10 5 10-5-10-5Z'/%3E%3Cpath fill='%23666' d='M5.4 11.2 3 12.4l10 5 10-5-2.4-1.2L13 15l-7.6-3.8Z'/%3E%3Cpath fill='%23666' d='M5.4 15.6 3 16.8l10 5 10-5-2.4-1.2L13 19.4l-7.6-3.8Z'/%3E%3C/svg%3E");
 	width: 36px;
 	height: 36px;
 	}
 .leaflet-retina .leaflet-control-layers-toggle {
-	background-image: url(images/layers-2x.png);
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 26 26'%3E%3Cpath fill='%23666' d='M13 3 3 8l10 5 10-5-10-5Z'/%3E%3Cpath fill='%23666' d='M5.4 11.2 3 12.4l10 5 10-5-2.4-1.2L13 15l-7.6-3.8Z'/%3E%3Cpath fill='%23666' d='M5.4 15.6 3 16.8l10 5 10-5-2.4-1.2L13 19.4l-7.6-3.8Z'/%3E%3C/svg%3E");
 	background-size: 26px 26px;
 	}
 .leaflet-touch .leaflet-control-layers-toggle {
